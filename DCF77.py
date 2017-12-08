@@ -19,7 +19,7 @@ def to_binary(value, size):
 
 # Convert int to BCD
 def bcd(value, size):
-    if size < 4:
+    if size <= 4:
         return to_binary(value, size)
     else:
         ones = to_binary(math.floor(value % 10), 4)
@@ -152,9 +152,9 @@ signal.signal(signal.SIGINT, sigint_handler)
 # Generate bit sequence
 seq = generate_bits()
 
-# Time generateTone to nearest second
-startTime = datetime.now()
-while startTime.second == datetime.now().second:
+# Time generate_tone to the start of next second
+start_time = datetime.now()
+while start_time.second == datetime.now().second:
     pass
 
 print "Transmitting DCF77 signal...\nPress Ctrl + C to stop."
