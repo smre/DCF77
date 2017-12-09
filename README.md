@@ -12,9 +12,11 @@ This script was tested on my Casio Wave Ceptor wristwatch.
 
 ### Instructions
 
-1. Run the script. The sound will start playing immediately. The encoded time signal will automatically be in German time (UTC+1).
-2. Set your radio controlled watch or clock to "receive" mode and place its antenna near the speaker or headphones (~ 1-5 cm)
+1. Run the script. The sound will start playing immediately. The encoded time signal will automatically be in German time (UTC+1)<sup>__1__</sup>.
+2. Set your radio controlled watch or clock to "receive" mode and place its antenna near the speaker or headphones (~1-5 cm)
 3. Wait. It can take anywhere from 2 to 10 minutes for your watch to synchronize. This script will produce 10-11 minutes of DCF77 signal before closing. You can terminate the script yourself by pressing <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+<sup>__1__</sup> To change the signal timezone, edit [line 11](https://github.com/smre/DCF77/blob/6e250097d081fec1db9d0723db5563f866729d30/DCF77.py#L11) in the script.
 
 ### What if it doesn't work?
 
