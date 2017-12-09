@@ -1,6 +1,6 @@
 # DCF77.py
 
-Python script that transmits a faux [DCF77](https://en.wikipedia.org/wiki/DCF77) signal. It uses system time as its time source. It can be used to time radio controlled clocks and watches that accept DCF77 signal. Requires PyAudio and NumPy to run.
+Python script that transmits a faux [DCF77](https://en.wikipedia.org/wiki/DCF77) signal. It uses system time as its time source. It can be used to time radio controlled clocks and watches that accept DCF77 signal. Requires [PyAudio](http://people.csail.mit.edu/hubert/pyaudio/) and [NumPy](http://www.numpy.org/) to run.
 
 This script was tested on my Casio Wave Ceptor wristwatch.
 
