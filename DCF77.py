@@ -7,8 +7,8 @@ import numpy as np
 import signal
 import sys
 
-chunks = []
-p = pyaudio.PyAudio()
+# Signal timezone (Default is Europe/Berlin UTC+1)
+signal_timezone = 'Europe/Berlin'
 
 
 # Convert int to DCF77 compatible binary string
@@ -46,13 +46,14 @@ def add_minutes(time, minutes):
 
 # Generate one minute string
 def generate_minute(time):
+    global signal_timezone
 
     # first 17 "useless" bits
     minute = '0' * 17
 
     # DST data
-    minute += str(int(is_dst('Europe/Berlin')))
-    minute += str(int(not is_dst('Europe/Berlin')))
+    minute += str(int(is_dst(signal_timezone)))
+    minute += str(int(not is_dst(signal_timezone)))
 
     # start time code
     minute += '01'
@@ -86,12 +87,13 @@ def generate_minute(time):
 
 # Generate 11 minutes of DCF77 signal
 def generate_bits():
+    global signal_timezone
     bits = ''
 
-    # Get German time
+    # Get signal timezone time
     zero_date = pytz.utc.localize(datetime.utcnow())
-    de_tz = timezone('Europe/Berlin')
-    time = zero_date.astimezone(de_tz)
+    signal_tz = timezone(signal_timezone)
+    time = zero_date.astimezone(signal_tz)
 
     for i in range(1, 12):
         bits += generate_minute(add_minutes(time, i))
@@ -107,7 +109,7 @@ def sine(frequency, length, rate, strength):
 
 
 # Play a tone
-def play_tone(stream):
+def play_tone(chunks, stream):
     # Distort the signal
     chunk = np.concatenate(chunks) * 32767
     chunk = np.floor(chunk) / 32767
@@ -116,11 +118,12 @@ def play_tone(stream):
 
 # Generate a tone
 def generate_tone(input):
-    global chunks
+    chunks = []
     t = datetime.now()
     code = input[t.second:]
     frequency = 15500
     rate = 44100
+    p = pyaudio.PyAudio()
     stream = p.open(format=pyaudio.paFloat32, channels=1, rate=rate, output=1)
 
     for c in code:
@@ -134,7 +137,7 @@ def generate_tone(input):
             # special "59th" second. No amplitude modulation.
             chunks.append(sine(frequency, 1.0, rate, 1.0))
 
-        play_tone(stream)
+        play_tone(chunks, stream)
         chunks = []
 
     stream.close()
@@ -147,16 +150,16 @@ def sigint_handler(signal, frame):
     sys.exit(0)
 
 
-signal.signal(signal.SIGINT, sigint_handler)
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, sigint_handler)
 
-# Generate bit sequence
-seq = generate_bits()
+    seq = generate_bits()
 
-# Time generate_tone to the start of next second
-start_time = datetime.now()
-while start_time.second == datetime.now().second:
-    pass
+    # Time generate_tone to the start of next second
+    start_time = datetime.now()
+    while start_time.second == datetime.now().second:
+        pass
 
-print "Transmitting DCF77 signal...\nPress Ctrl + C to stop."
-generate_tone(seq)
-print "Transmission finished."
+    print 'Transmitting DCF77 signal ({})\nPress Ctrl + C to stop.'.format(signal_timezone)
+    generate_tone(seq)
+    print 'Transmission finished.'
